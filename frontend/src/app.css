@@ -1,0 +1,26 @@
+@import "tailwindcss";
+@source not "../bindings";
+@plugin "daisyui" {
+  prefix: "dy-";
+  themes: corporate --default, dim --prefersdark;
+}
+
+@layer base {
+  body {
+    user-select: none;
+    --wails-draggable: drag;
+  }
+  input,
+  textarea {
+    user-select: text;
+  }
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  .dy-btn,
+  .dy-input {
+    --wails-draggable: no-drag;
+  }
+}
