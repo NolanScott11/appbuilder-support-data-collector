@@ -8,19 +8,9 @@
 @layer base {
   body {
     user-select: none;
-    --wails-draggable: drag;
   }
   input,
   textarea {
     user-select: text;
-  }
-  a,
-  button,
-  input,
-  select,
-  textarea,
-  .dy-btn,
-  .dy-input {
-    --wails-draggable: no-drag;
   }
 }
