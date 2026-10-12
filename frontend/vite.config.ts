@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import wails from "@wailsio/runtime/plugins/vite";
 import { readFileSync } from "node:fs";
+import tailwindcss from "@tailwindcss/vite";
 
 // Read the pinned Wails version straight from go.mod so the footer can't
 // drift out of sync with it the way a hardcoded string did.
@@ -20,7 +21,7 @@ export default defineConfig({
     port: Number(process.env.WAILS_VITE_PORT) || 9245,
     strictPort: true,
   },
-  plugins: [svelte(), wails("./bindings")],
+  plugins: [tailwindcss(), svelte(), wails("./bindings")],
   define: {
     __WAILS_VERSION__: JSON.stringify(wailsVersion),
   },
