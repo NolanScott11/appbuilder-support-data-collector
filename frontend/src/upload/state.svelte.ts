@@ -10,4 +10,6 @@ export const upload = $state({
   project: undefined as ProjectInfo | undefined,
   /** Where the support data will be sent. */
   uploadUrl: "",
+  /** Whether the mock access flow has been completed. */
+  accessGranted: false,
 });

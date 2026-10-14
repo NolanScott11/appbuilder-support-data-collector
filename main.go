@@ -52,8 +52,10 @@ func main() {
 	// 'URL' is the URL that will be loaded into the webview.
 	app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:  "Upload Support Data",
-		Width:  720,
-		Height: 480,
+		Width:     800,
+		Height:    640,
+		MinWidth:  640,
+		MinHeight: 480,
 		Mac: application.MacWindow{
 			TitleBar: application.MacTitleBarDefault,
 		},

@@ -11,7 +11,8 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
-    "@wailsio/runtime": "latest"
+    "@wailsio/runtime": "latest",
+    "marked": "^18.1.1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
