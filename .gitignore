@@ -13,6 +13,9 @@
 # Build output
 /bin/
 /dist/
+/build/darwin/icons.icns
+/build/windows/icon.ico
+/build/linux/*.desktop
 # Pre-built binaries staged for goreleaser (see .github/workflows/release.yml)
 /dist-artifacts/
 
