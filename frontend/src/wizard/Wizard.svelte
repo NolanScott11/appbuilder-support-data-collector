@@ -8,6 +8,8 @@
 <script lang="ts">
   import { setWizard } from "./context";
   import type { WizardPageDef, WizardPageHooks } from "./types";
+  import { m } from "../lib/paraglide/messages.js";
+  import { getLocale, locales, setLocale } from "../lib/paraglide/runtime.js";
 
   interface Props {
     pages: WizardPageDef[];
@@ -45,7 +47,19 @@
   let canBack = $derived(!busy && previousIndex !== -1 && (hooks?.canBack?.() ?? true));
   let canNext = $derived(!busy && (hooks?.canNext?.() ?? true));
   let canCancel = $derived(hooks?.canCancel?.() ?? true);
-  let nextCaption = $derived(hooks?.nextCaption?.() ?? (isLastPage ? "Finish" : "Next"));
+  let nextCaption = $derived(hooks?.nextCaption?.() ?? (isLastPage ? m.finish() : m.next()));
+  let pageTitle = $derived(typeof page.title === "function" ? page.title() : page.title);
+  let pageSubtitle = $derived(
+    typeof page.subtitle === "function" ? page.subtitle() : page.subtitle,
+  );
+  let languageNames = $derived(new Intl.DisplayNames([getLocale()], { type: "language" }));
+
+  function changeLocale(event: Event): void {
+    const selected = (event.currentTarget as HTMLSelectElement).value;
+    if (locales.includes(selected as (typeof locales)[number])) {
+      setLocale(selected as (typeof locales)[number]);
+    }
+  }
 
   function goNext(): void {
     if (isLastPage) {
@@ -82,11 +96,21 @@
 </script>
 
 <div class="flex h-dvh flex-col bg-base-100">
-  <header class="border-b border-base-300 bg-base-200 px-4 py-3">
-    <h1 class="font-semibold">{page.title}</h1>
-    {#if page.subtitle}
-      <p class="text-sm text-base-content/70">{page.subtitle}</p>
-    {/if}
+  <header class="flex items-start justify-between gap-4 border-b border-base-300 bg-base-200 px-4 py-3">
+    <div>
+      <h1 class="font-semibold">{pageTitle}</h1>
+      {#if pageSubtitle}
+        <p class="text-sm text-base-content/70">{pageSubtitle}</p>
+      {/if}
+    </div>
+    <label class="flex shrink-0 items-center gap-2 text-sm">
+      <span class="whitespace-nowrap">{m.language()}</span>
+      <select class="dy-select dy-select-sm" value={getLocale()} onchange={changeLocale}>
+        {#each locales as availableLocale}
+          <option value={availableLocale}>{languageNames.of(availableLocale)}</option>
+        {/each}
+      </select>
+    </label>
   </header>
 
   <main class="flex-1 overflow-y-auto px-6 py-5">
@@ -95,11 +119,11 @@
   </main>
 
   <footer class="flex justify-end gap-2 px-4 py-3">
-    <button class="dy-btn dy-btn-sm" disabled={!canBack} onclick={onBackClick}>Back</button>
+    <button class="dy-btn dy-btn-sm" disabled={!canBack} onclick={onBackClick}>{m.back()}</button>
     <button class="dy-btn dy-btn-sm dy-btn-primary" disabled={!canNext} onclick={onNextClick}>
       {#if busy}<span class="dy-loading dy-loading-spinner dy-loading-xs"></span>{/if}
       {nextCaption}
     </button>
-    <button class="dy-btn dy-btn-sm" disabled={!canCancel} onclick={onCancelClick}>Cancel</button>
+    <button class="dy-btn dy-btn-sm" disabled={!canCancel} onclick={onCancelClick}>{m.cancel()}</button>
   </footer>
 </div>
