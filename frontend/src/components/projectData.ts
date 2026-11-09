@@ -4,9 +4,6 @@ export type ProjectDataSelection = Record<ProjectDataItemId, boolean>;
 
 export interface ProjectDataItem {
   id: ProjectDataItemId;
-  title: string;
-  description: string;
-  sensitiveNote?: string;
   fileName(projectName: string): string;
 }
 
@@ -14,16 +11,10 @@ export interface ProjectDataItem {
 export const projectDataItems: ProjectDataItem[] = [
   {
     id: "projectConfiguration",
-    title: "Project configuration",
-    description: "The App Builder project definition.",
-    sensitiveNote: "May contain service configuration or integration details.",
     fileName: (projectName) => `${projectName}.appDef`,
   },
   {
     id: "projectContent",
-    title: "Project content",
-    description: "The files in the project's content folder.",
-    sensitiveNote: "May contain unpublished or otherwise sensitive project content.",
     fileName: () => "project_data/",
   },
 ];
