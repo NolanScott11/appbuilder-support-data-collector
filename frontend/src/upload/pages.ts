@@ -15,8 +15,8 @@ export const pages: WizardPageDef[] = [
   },
   {
     id: "project-data",
-    title: "Project Data",
-    subtitle: "Review and choose the project data to include",
+    title: () => m.project_data_page_title(),
+    subtitle: () => m.project_data_page_subtitle(),
     component: ProjectDataPage,
   },
   {

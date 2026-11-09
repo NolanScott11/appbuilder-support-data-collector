@@ -2,6 +2,7 @@
   import ProjectDataSelection from "../../components/ProjectDataSelection.svelte";
   import type { ProjectDataItemId } from "../../components/projectData";
   import { upload } from "../state.svelte";
+  import { m } from "../../lib/paraglide/messages.js";
 
   function setSelected(id: ProjectDataItemId, selected: boolean): void {
     upload.selectedProjectData[id] = selected;
@@ -9,10 +10,9 @@
 </script>
 
 <div class="mb-5">
-  <h2 class="text-lg font-semibold">Choose Project Data</h2>
+  <h2 class="text-lg font-semibold">{m.project_data_heading()}</h2>
   <p class="mt-1 text-sm text-base-content/70">
-    Support requested these project items for the investigation. Review what each contains and
-    change the selection before continuing.
+    {m.project_data_intro()}
   </p>
 </div>
 
@@ -25,5 +25,6 @@
 {/if}
 
 <p class="mt-4 text-sm text-base-content/70">
-  You can deselect any item. Only items marked <strong>Included</strong> will be prepared for upload.
+  {m.project_data_footer_before()} <strong>{m.project_data_included()}</strong>
+  {m.project_data_footer_after()}
 </p>
