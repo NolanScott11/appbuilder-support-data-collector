@@ -17,5 +17,12 @@ export const upload = $state({
   selectedProjectData: {
     projectConfiguration: true,
     projectContent: true,
+    mediaResources: false,
+    customFiles: true,
+    firebaseConfiguration: true,
+    analyticsConfiguration: true,
+    iosSigning: false,
+    androidSigning: false,
+    buildDiagnostics: false,
   } as ProjectDataSelection,
 });
