@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ProjectDataItemId, ProjectDataSelection } from "./projectData";
+  import type { ProjectInfo } from "../../bindings/github.com/sillsdev/appbuilder-support-data-collector";
   import { projectDataItems } from "./projectData";
   import { m } from "../lib/paraglide/messages.js";
   import TopicAppIcon from "../lib/icons/TopicAppIcon.svelte";
@@ -13,12 +14,12 @@
   import TopicDocumentsIcon from "../lib/icons/TopicDocumentsIcon.svelte";
 
   interface Props {
-    projectName: string;
+    project: ProjectInfo;
     selection: ProjectDataSelection;
     onSelectionChange: (id: ProjectDataItemId, selected: boolean) => void;
   }
 
-  let { projectName, selection, onSelectionChange }: Props = $props();
+  let { project, selection, onSelectionChange }: Props = $props();
 
   function itemTitle(id: ProjectDataItemId): string {
     switch (id) {
@@ -116,7 +117,7 @@
               {/if}
             </span>
             <span class="mt-1 block text-sm text-base-content/70">{itemDescription(item.id)}</span>
-            <code class="mt-2 block break-all text-sm">{item.fileName(projectName)}</code>
+            <code class="mt-2 block break-all text-sm">{item.fileName(project)}</code>
             {#if sensitiveNote(item.id)}
               <span class="mt-2 block text-sm font-medium text-base-content">
                 {m.project_data_sensitive_prefix()} {sensitiveNote(item.id)}

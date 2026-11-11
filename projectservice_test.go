@@ -9,14 +9,14 @@ import (
 
 func TestGetProjectInfo(t *testing.T) {
 	folder := t.TempDir()
-	appDef := filepath.Join(folder, "WEB_Gospels.appDef")
+	appDef := filepath.Join(folder, "test.appDef")
 	if err := os.WriteFile(appDef, []byte("<app-definition/>"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.MkdirAll(filepath.Join(folder, "data"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(folder, "test_project_data"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(folder, "data", "book.usfm"), make([]byte, 1000), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(folder, "test_project_data", "book.usfm"), make([]byte, 1000), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	modified := time.Date(2026, 10, 2, 9, 20, 21, 0, time.UTC)
@@ -29,8 +29,14 @@ func TestGetProjectInfo(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if info.Name != "WEB_Gospels" {
-		t.Errorf("Name = %q, want %q", info.Name, "WEB_Gospels")
+	if info.Name != "test" {
+		t.Errorf("Name = %q, want %q", info.Name, "test")
+	}
+	if info.AppDefFileName != "test.appDef" {
+		t.Errorf("AppDefFileName = %q, want %q", info.AppDefFileName, "test.appDef")
+	}
+	if info.ContentFolderName != "test_project_data" {
+		t.Errorf("ContentFolderName = %q, want %q", info.ContentFolderName, "test_project_data")
 	}
 	if info.LastModified != modified.UnixMilli() {
 		t.Errorf("LastModified = %d, want %d", info.LastModified, modified.UnixMilli())

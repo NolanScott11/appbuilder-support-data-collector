@@ -18,7 +18,7 @@
 
 {#if upload.project}
   <ProjectDataSelection
-    projectName={upload.project.name}
+    project={upload.project}
     selection={upload.selectedProjectData}
     onSelectionChange={setSelected}
   />

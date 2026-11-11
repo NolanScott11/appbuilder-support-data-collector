@@ -1,3 +1,5 @@
+import type { ProjectInfo } from "../../bindings/github.com/sillsdev/appbuilder-support-data-collector";
+
 export type ProjectDataItemId =
   | "projectConfiguration"
   | "projectContent"
@@ -17,7 +19,7 @@ export interface ProjectDataItem {
   description: string;
   sensitiveNote?: string;
   excluded?: boolean;
-  fileName(projectName: string): string;
+  fileName(project: ProjectInfo): string;
 }
 
 /** MVP project data categories requested for support investigations. */
@@ -27,14 +29,15 @@ export const projectDataItems: ProjectDataItem[] = [
     title: "Project configuration",
     description: "The App Builder project definition.",
     sensitiveNote: "May contain service configuration or integration details.",
-    fileName: (projectName) => `${projectName}.appDef`,
+    fileName: (project) =>
+      project.appDefFileName || (project.name ? `${project.name}.appDef` : "App definition file not found"),
   },
   {
     id: "projectContent",
     title: "Project content",
     description: "The files in the project's content folder.",
     sensitiveNote: "May contain unpublished or otherwise sensitive project content.",
-    fileName: () => "project_data/",
+    fileName: (project) => project.contentFolderName || "Content folder not found",
   },
   /*
   {

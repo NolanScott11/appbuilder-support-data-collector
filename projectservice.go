@@ -10,7 +10,9 @@ import (
 
 // ProjectInfo describes the App Builder project whose support data will be uploaded.
 type ProjectInfo struct {
-	Name string `json:"name"`
+	Name              string `json:"name"`
+	AppDefFileName    string `json:"appDefFileName"`
+	ContentFolderName string `json:"contentFolderName"`
 	// Folder is the absolute path of the project folder.
 	Folder string `json:"folder"`
 	// LastModified is the modification time of <name>.appDef, in Unix milliseconds.
@@ -50,6 +52,11 @@ func (p *ProjectService) GetProjectInfo(folder string) (ProjectInfo, error) {
 	if err != nil {
 		return ProjectInfo{}, err
 	}
+	name := strings.TrimSuffix(appDef.Name(), filepath.Ext(appDef.Name()))
+	contentFolderName, err := findContentFolderName(folder, name)
+	if err != nil {
+		return ProjectInfo{}, err
+	}
 
 	var size int64
 	err = filepath.WalkDir(folder, func(path string, d fs.DirEntry, err error) error {
@@ -70,9 +77,50 @@ func (p *ProjectService) GetProjectInfo(folder string) (ProjectInfo, error) {
 	}
 
 	return ProjectInfo{
-		Name:         strings.TrimSuffix(appDef.Name(), filepath.Ext(appDef.Name())),
-		Folder:       folder,
-		LastModified: appDef.ModTime().UnixMilli(),
-		FolderSize:   size,
+		Name:              name,
+		AppDefFileName:    appDef.Name(),
+		ContentFolderName: contentFolderName,
+		Folder:            folder,
+		LastModified:      appDef.ModTime().UnixMilli(),
+		FolderSize:        size,
 	}, nil
+}
+
+func findContentFolderName(folder, projectName string) (string, error) {
+	entries, err := os.ReadDir(folder)
+	if err != nil {
+		return "", err
+	}
+
+	var matchingNames []string
+	var contentFolderNames []string
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		name := entry.Name()
+		if strings.EqualFold(name, projectName+"_project_data") || strings.EqualFold(name, projectName+"_data") {
+			matchingNames = append(matchingNames, name)
+		}
+		if strings.HasSuffix(strings.ToLower(name), "_project_data") || strings.HasSuffix(strings.ToLower(name), "_data") {
+			contentFolderNames = append(contentFolderNames, name)
+		}
+	}
+
+	if len(matchingNames) == 1 {
+		return matchingNames[0], nil
+	}
+	if len(matchingNames) > 1 {
+		for _, name := range matchingNames {
+			if strings.EqualFold(name, projectName+"_project_data") {
+				return name, nil
+			}
+		}
+		return "", nil
+	}
+	if len(contentFolderNames) == 1 {
+		return contentFolderNames[0], nil
+	}
+	return "", nil
 }

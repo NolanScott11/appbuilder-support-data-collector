@@ -28,7 +28,7 @@
   {#if selectedItems.length > 0}
     <ul class="list-inside list-disc text-sm mb-4">
       {#each selectedItems as item (item.id)}
-        <li>{item.fileName(upload.project?.name ?? "")}</li>
+        <li>{upload.project ? item.fileName(upload.project) : ""}</li>
       {/each}
     </ul>
   {:else}

@@ -37,7 +37,7 @@
   {#if selectedItems.length > 0}
     <ul class="mt-2 list-inside list-disc text-sm">
       {#each selectedItems as item (item.id)}
-        <li>{item.fileName(upload.project?.name ?? "")}</li>
+        <li>{upload.project ? item.fileName(upload.project) : ""}</li>
       {/each}
     </ul>
   {:else}
