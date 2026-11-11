@@ -36,6 +36,7 @@ export const projectDataItems: ProjectDataItem[] = [
     sensitiveNote: "May contain unpublished or otherwise sensitive project content.",
     fileName: () => "project_data/",
   },
+  /*
   {
     id: "mediaResources",
     title: "Media and other project resources",
@@ -82,6 +83,7 @@ export const projectDataItems: ProjectDataItem[] = [
     description: "Build logs, error output, tool versions, and other diagnostic data.",
     fileName: () => "build_diagnostics/",
   },
+  */
 ];
 
 export function getSelectedProjectDataItems(

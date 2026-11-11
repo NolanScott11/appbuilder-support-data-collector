@@ -33,7 +33,7 @@
 </fieldset>
 
 <section class="mt-5 rounded-box border border-base-300 bg-base-200 p-4">
-  <h3 class="text-sm font-semibold">Data selected for upload</h3>
+  <h3 class="text-sm font-semibold">{m.upload_data_selected_title()}</h3>
   {#if selectedItems.length > 0}
     <ul class="mt-2 list-inside list-disc text-sm">
       {#each selectedItems as item (item.id)}
@@ -42,11 +42,11 @@
     </ul>
   {:else}
     <p class="mt-2 text-sm text-base-content/70">
-      No project data is selected. No project files will be prepared for upload.
+      {m.upload_data_empty()}
     </p>
   {/if}
   <p class="mt-3 text-sm text-base-content/70">
-    Go Back to change your selection before requesting upload access.
+    {m.upload_data_back_hint()}
   </p>
 </section>
 

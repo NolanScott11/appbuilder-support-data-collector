@@ -118,7 +118,7 @@
             <span class="mt-1 block text-sm text-base-content/70">{itemDescription(item.id)}</span>
             <code class="mt-2 block break-all text-sm">{item.fileName(projectName)}</code>
             {#if sensitiveNote(item.id)}
-              <span class="mt-2 block text-sm text-warning">
+              <span class="mt-2 block text-sm font-medium text-base-content">
                 {m.project_data_sensitive_prefix()} {sensitiveNote(item.id)}
               </span>
             {/if}
