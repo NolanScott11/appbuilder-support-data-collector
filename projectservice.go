@@ -5,7 +5,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // ProjectInfo describes the App Builder project whose support data will be uploaded.
@@ -23,36 +22,37 @@ type ProjectInfo struct {
 
 // ProjectService gives the frontend information about the project being uploaded.
 type ProjectService struct {
-	// folder is the project folder passed on the command line, if any.
-	folder string
+	// projectFolder is the project folder passed on the command line, if any.
+	projectFolder string
 }
 
 // GetStartupFolder returns the project folder passed on the command line,
 // or an empty string if none was given.
 func (p *ProjectService) GetStartupFolder() string {
-	return p.folder
+	return p.projectFolder
 }
 
-// GetProjectInfo finds the .appDef file in folder and returns details of the project.
+// GetProjectInfo finds <folder-name>.appDef and <folder-name>_data in folder.
 func (p *ProjectService) GetProjectInfo(folder string) (ProjectInfo, error) {
 	folder, err := filepath.Abs(folder)
 	if err != nil {
 		return ProjectInfo{}, err
 	}
 
-	appDefs, err := filepath.Glob(filepath.Join(folder, "*.appDef"))
+	name := filepath.Base(folder)
+	appDefFileName := name + ".appDef"
+	appDefPath := filepath.Join(folder, appDefFileName)
+	appDef, err := os.Stat(appDefPath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return ProjectInfo{}, errors.New("no " + appDefFileName + " file found in " + folder)
+		}
 		return ProjectInfo{}, err
 	}
-	if len(appDefs) == 0 {
-		return ProjectInfo{}, errors.New("no .appDef file found in " + folder)
+	if !appDef.Mode().IsRegular() {
+		return ProjectInfo{}, errors.New("project definition is not a file: " + appDefPath)
 	}
 
-	appDef, err := os.Stat(appDefs[0])
-	if err != nil {
-		return ProjectInfo{}, err
-	}
-	name := strings.TrimSuffix(appDef.Name(), filepath.Ext(appDef.Name()))
 	contentFolderName, err := findContentFolderName(folder, name)
 	if err != nil {
 		return ProjectInfo{}, err
@@ -78,7 +78,7 @@ func (p *ProjectService) GetProjectInfo(folder string) (ProjectInfo, error) {
 
 	return ProjectInfo{
 		Name:              name,
-		AppDefFileName:    appDef.Name(),
+		AppDefFileName:    appDefFileName,
 		ContentFolderName: contentFolderName,
 		Folder:            folder,
 		LastModified:      appDef.ModTime().UnixMilli(),
@@ -92,35 +92,11 @@ func findContentFolderName(folder, projectName string) (string, error) {
 		return "", err
 	}
 
-	var matchingNames []string
-	var contentFolderNames []string
+	expectedName := projectName + "_data"
 	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
+		if entry.IsDir() && entry.Name() == expectedName {
+			return entry.Name(), nil
 		}
-
-		name := entry.Name()
-		if strings.EqualFold(name, projectName+"_project_data") || strings.EqualFold(name, projectName+"_data") {
-			matchingNames = append(matchingNames, name)
-		}
-		if strings.HasSuffix(strings.ToLower(name), "_project_data") || strings.HasSuffix(strings.ToLower(name), "_data") {
-			contentFolderNames = append(contentFolderNames, name)
-		}
-	}
-
-	if len(matchingNames) == 1 {
-		return matchingNames[0], nil
-	}
-	if len(matchingNames) > 1 {
-		for _, name := range matchingNames {
-			if strings.EqualFold(name, projectName+"_project_data") {
-				return name, nil
-			}
-		}
-		return "", nil
-	}
-	if len(contentFolderNames) == 1 {
-		return contentFolderNames[0], nil
 	}
 	return "", nil
 }

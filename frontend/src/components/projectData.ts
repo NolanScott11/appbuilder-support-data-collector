@@ -1,4 +1,8 @@
+import type { Component } from "svelte";
 import type { ProjectInfo } from "../../bindings/github.com/sillsdev/appbuilder-support-data-collector";
+import { m } from "../lib/paraglide/messages.js";
+import TopicAppIcon from "../lib/icons/TopicAppIcon.svelte";
+import TopicContentsIcon from "../lib/icons/TopicContentsIcon.svelte";
 
 export type ProjectDataItemId =
   | "projectConfiguration"
@@ -15,29 +19,43 @@ export type ProjectDataSelection = Record<ProjectDataItemId, boolean>;
 
 export interface ProjectDataItem {
   id: ProjectDataItemId;
-  title: string;
-  description: string;
-  sensitiveNote?: string;
+  title: () => string;
+  description: (project: ProjectInfo) => string;
+  sensitiveNote?: () => string;
+  icon: Component;
   excluded?: boolean;
-  fileName(project: ProjectInfo): string;
+  fileName(project: ProjectInfo): string | undefined;
+  isAvailable(project: ProjectInfo): boolean;
+}
+
+export function getExpectedContentFolderName(project: ProjectInfo): string {
+  return project.name ? `${project.name}_data` : "";
 }
 
 /** MVP project data categories requested for support investigations. */
 export const projectDataItems: ProjectDataItem[] = [
   {
     id: "projectConfiguration",
-    title: "Project configuration",
-    description: "The App Builder project definition.",
-    sensitiveNote: "May contain service configuration or integration details.",
-    fileName: (project) =>
-      project.appDefFileName || (project.name ? `${project.name}.appDef` : "App definition file not found"),
+    title: m.project_data_configuration_title,
+    description: (project) => m.project_data_configuration_description({
+      appDefFileName: project.appDefFileName,
+    }),
+    sensitiveNote: m.project_data_configuration_sensitive_note,
+    icon: TopicAppIcon,
+    fileName: (project) => project.appDefFileName || undefined,
+    isAvailable: (project) => Boolean(project.appDefFileName),
   },
   {
     id: "projectContent",
-    title: "Project content",
-    description: "The files in the project's content folder.",
-    sensitiveNote: "May contain unpublished or otherwise sensitive project content.",
-    fileName: (project) => project.contentFolderName || "Content folder not found",
+    title: m.project_data_content_title,
+    description: (project) => m.project_data_content_description({
+      appDefFileName: project.appDefFileName,
+      contentFolderName: getExpectedContentFolderName(project),
+    }),
+    sensitiveNote: m.project_data_content_sensitive_note,
+    icon: TopicContentsIcon,
+    fileName: (project) => project.contentFolderName || undefined,
+    isAvailable: (project) => Boolean(project.name && project.contentFolderName),
   },
   /*
   {
@@ -91,6 +109,12 @@ export const projectDataItems: ProjectDataItem[] = [
 
 export function getSelectedProjectDataItems(
   selection: ProjectDataSelection,
+  project: ProjectInfo | undefined,
 ): ProjectDataItem[] {
-  return projectDataItems.filter((item) => !item.excluded && selection[item.id]);
+  if (!project) {
+    return [];
+  }
+  return projectDataItems.filter(
+    (item) => !item.excluded && selection[item.id] && item.isAvailable(project),
+  );
 }

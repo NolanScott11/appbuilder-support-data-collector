@@ -3,7 +3,7 @@
   import { upload } from "../state.svelte";
   import { m } from "../../lib/paraglide/messages.js";
 
-  let selectedItems = $derived(getSelectedProjectDataItems(upload.selectedProjectData));
+  let selectedItems = $derived(getSelectedProjectDataItems(upload.selectedProjectData, upload.project));
 
   export function canNext(): boolean {
     return upload.accessGranted;
